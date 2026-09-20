@@ -16,9 +16,14 @@ type rotor struct {
 	position int
 }
 
-// Enigma encrypts every possible byte value using three rotors and a
-// reflector. It is a 256-contact generalization of Enigma's rotor mechanism;
-// the historical Enigma I itself used 26 contacts for letters A-Z.
+// Position contains the initial positions of the left, middle, and right
+// rotors. Every byte value from 0 to 255 is valid.
+type Position struct {
+	Left   byte
+	Middle byte
+	Right  byte
+}
+
 type Enigma struct {
 	left      rotor
 	middle    rotor
@@ -26,21 +31,14 @@ type Enigma struct {
 	reflector [alphabetSize]byte
 }
 
-// New constructs a machine with three fixed 256-contact rotors. positions
-// contains three byte values from 0 to 255, separated by commas, for example
-// "0,0,0".
-func New(positions string) (*Enigma, error) {
-	positionValues, err := parsePositions(positions)
-	if err != nil {
-		return nil, err
-	}
-
+// New constructs a machine with three fixed 256-contact rotors.
+func New(position Position) *Enigma {
 	return &Enigma{
-		left:      newRotor(0xA341316C, 17, positionValues[0]),
-		middle:    newRotor(0xC8013EA4, 91, positionValues[1]),
-		right:     newRotor(0xAD90777D, 201, positionValues[2]),
+		left:      newRotor(0xA341316C, 17, position.Left),
+		middle:    newRotor(0xC8013EA4, 91, position.Middle),
+		right:     newRotor(0xAD90777D, 201, position.Right),
 		reflector: newReflector(),
-	}, nil
+	}
 }
 
 // TransformByte encrypts one byte. It advances the rotors before every byte
@@ -69,29 +67,30 @@ func (machine *Enigma) stepRotors() {
 	machine.right.step()
 }
 
-func parsePositions(value string) ([3]int, error) {
+// ParsePosition parses a comma-separated position supplied by the CLI.
+func ParsePosition(value string) (Position, error) {
 	parts := strings.Split(value, ",")
 	if len(parts) != 3 {
-		return [3]int{}, fmt.Errorf("positions должен содержать три значения от 0 до 255 через запятую")
+		return Position{}, fmt.Errorf("positions должен содержать три значения от 0 до 255 через запятую")
 	}
 
-	var positions [3]int
+	values := [3]byte{}
 	for index, part := range parts {
 		parsed, err := strconv.Atoi(part)
 		if err != nil || parsed < 0 || parsed >= alphabetSize {
-			return [3]int{}, fmt.Errorf("некорректная позиция ротора %q: ожидается значение от 0 до 255", part)
+			return Position{}, fmt.Errorf("некорректная позиция ротора %q: ожидается значение от 0 до 255", part)
 		}
-		positions[index] = parsed
+		values[index] = byte(parsed)
 	}
-	return positions, nil
+	return Position{Left: values[0], Middle: values[1], Right: values[2]}, nil
 }
 
-func newRotor(seed uint32, notch, position int) rotor {
+func newRotor(seed uint32, notch int, position byte) rotor {
 	wiring := permutation(seed)
 	result := rotor{
 		wiring:   wiring,
 		notch:    notch,
-		position: position,
+		position: int(position),
 	}
 	for index, target := range wiring {
 		result.reverse[target] = byte(index)

@@ -20,10 +20,6 @@ func newEncryptCommand() *cobra.Command {
 	return newTransformCommand("encrypt", "Зашифровать входной файл")
 }
 
-func newDecryptCommand() *cobra.Command {
-	return newTransformCommand("decrypt", "Расшифровать входной файл")
-}
-
 func newTransformCommand(use, short string) *cobra.Command {
 	options := encryptOptions{}
 	command := &cobra.Command{
@@ -42,11 +38,11 @@ func newTransformCommand(use, short string) *cobra.Command {
 }
 
 func execute(options encryptOptions) error {
-	machine, err := enigma.New(options.positions)
-
+	position, err := enigma.ParsePosition(options.positions)
 	if err != nil {
 		return fmt.Errorf("настройка Enigma: %w", err)
 	}
+	machine := enigma.New(position)
 
 	input, err := os.Open(options.input)
 	if err != nil {

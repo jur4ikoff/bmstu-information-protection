@@ -7,14 +7,9 @@ func TestTransformDecryptsWithSameSettings(t *testing.T) {
 	for index := range plainText {
 		plainText[index] = byte(index)
 	}
-	encryptor, err := New("12,34,56")
-	if err != nil {
-		t.Fatal(err)
-	}
-	decryptor, err := New("12,34,56")
-	if err != nil {
-		t.Fatal(err)
-	}
+	position := Position{Left: 12, Middle: 34, Right: 56}
+	encryptor := New(position)
+	decryptor := New(position)
 
 	cipherText := make([]byte, len(plainText))
 	for index, value := range plainText {
@@ -30,16 +25,13 @@ func TestTransformDecryptsWithSameSettings(t *testing.T) {
 }
 
 func TestNewRejectsInvalidPositions(t *testing.T) {
-	if _, err := New("0,0,256"); err == nil {
-		t.Fatal("New accepted an out-of-range rotor position")
+	if _, err := ParsePosition("0,0,256"); err == nil {
+		t.Fatal("ParsePosition accepted an out-of-range rotor position")
 	}
 }
 
 func TestNewKeepsBytePosition(t *testing.T) {
-	machine, err := New("255,0,0")
-	if err != nil {
-		t.Fatal(err)
-	}
+	machine := New(Position{Left: 255})
 	if got, want := machine.left.position, 255; got != want {
 		t.Fatalf("left rotor position = %d, want %d", got, want)
 	}

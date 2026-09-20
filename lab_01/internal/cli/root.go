@@ -22,6 +22,6 @@ func newRootCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	root.AddCommand(newEncryptCommand(), newDecryptCommand())
+	root.AddCommand(newEncryptCommand())
 	return root
 }
