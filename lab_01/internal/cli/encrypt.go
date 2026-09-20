@@ -7,37 +7,43 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/ypopov2005/bmstu-information-protection/pkg/enigma"
+	"github.com/ypopov2005/bmstu-information-protection/internal/enigma"
 )
 
 type encryptOptions struct {
 	input     string
 	output    string
 	positions string
-	plugboard string
 }
 
 func newEncryptCommand() *cobra.Command {
+	return newTransformCommand("encrypt", "Зашифровать входной файл")
+}
+
+func newDecryptCommand() *cobra.Command {
+	return newTransformCommand("decrypt", "Расшифровать входной файл")
+}
+
+func newTransformCommand(use, short string) *cobra.Command {
 	options := encryptOptions{}
 	command := &cobra.Command{
-		Use:   "encrypt",
-		Short: "Зашифровать входной файл",
+		Use:   use,
+		Short: short,
 		RunE: func(_ *cobra.Command, _ []string) error {
-			return encryptFile(options)
+			return execute(options)
 		},
 	}
 
 	command.Flags().StringVarP(&options.input, "input", "i", "", "Путь к входному файлу")
-	command.Flags().StringVarP(&options.output, "output", "o", "", "Путь к зашифрованному файлу")
-	command.Flags().StringVarP(&options.positions, "positions", "p", "AAA", "Начальные позиции роторов, например MCK")
-	command.Flags().StringVar(&options.plugboard, "plugboard", "", "Пары штекерной панели через пробел, например \"AV BS CG\"")
+	command.Flags().StringVarP(&options.output, "output", "o", "output.txt", "Путь к выходному файлу")
+	command.Flags().StringVarP(&options.positions, "positions", "p", "0,0,0", "Начальные позиции роторов, например 0,0,0")
 	_ = command.MarkFlagRequired("input")
-	_ = command.MarkFlagRequired("output")
 	return command
 }
 
-func encryptFile(options encryptOptions) error {
-	machine, err := enigma.New(options.positions, options.plugboard)
+func execute(options encryptOptions) error {
+	machine, err := enigma.New(options.positions)
+
 	if err != nil {
 		return fmt.Errorf("настройка Enigma: %w", err)
 	}
@@ -60,7 +66,7 @@ func encryptFile(options encryptOptions) error {
 	for {
 		count, readErr := reader.Read(buffer)
 		if count > 0 {
-			for index := 0; index < count; index++ {
+			for index := range count {
 				buffer[index] = machine.TransformByte(buffer[index])
 			}
 			if _, err := writer.Write(buffer[:count]); err != nil {
