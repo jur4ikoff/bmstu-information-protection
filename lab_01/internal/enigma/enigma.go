@@ -67,18 +67,17 @@ func (machine *Enigma) stepRotors() {
 	machine.right.step()
 }
 
-// ParsePosition parses a comma-separated position supplied by the CLI.
 func ParsePosition(value string) (Position, error) {
 	parts := strings.Split(value, ",")
 	if len(parts) != 3 {
-		return Position{}, fmt.Errorf("positions должен содержать три значения от 0 до 255 через запятую")
+		return Position{}, fmt.Errorf("positions must contain three comma-separated values from 0 to 255")
 	}
 
 	values := [3]byte{}
 	for index, part := range parts {
 		parsed, err := strconv.Atoi(part)
 		if err != nil || parsed < 0 || parsed >= alphabetSize {
-			return Position{}, fmt.Errorf("некорректная позиция ротора %q: ожидается значение от 0 до 255", part)
+			return Position{}, fmt.Errorf("invalid rotor position %q: expected a value from 0 to 255", part)
 		}
 		values[index] = byte(parsed)
 	}

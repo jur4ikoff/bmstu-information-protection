@@ -17,42 +17,37 @@ type encryptOptions struct {
 }
 
 func newEncryptCommand() *cobra.Command {
-	return newTransformCommand("encrypt", "Зашифровать входной файл")
-}
-
-func newTransformCommand(use, short string) *cobra.Command {
 	options := encryptOptions{}
 	command := &cobra.Command{
-		Use:   use,
-		Short: short,
+		Use:   "encrypt",
+		Short: "Зашифровать входной файл",
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return execute(options)
 		},
 	}
 
-	command.Flags().StringVarP(&options.input, "input", "i", "", "Путь к входному файлу")
+	command.Flags().StringVarP(&options.input, "input", "i", "input.txt", "Путь к входному файлу")
 	command.Flags().StringVarP(&options.output, "output", "o", "output.txt", "Путь к выходному файлу")
 	command.Flags().StringVarP(&options.positions, "positions", "p", "0,0,0", "Начальные позиции роторов, например 0,0,0")
-	_ = command.MarkFlagRequired("input")
 	return command
 }
 
 func execute(options encryptOptions) error {
 	position, err := enigma.ParsePosition(options.positions)
 	if err != nil {
-		return fmt.Errorf("настройка Enigma: %w", err)
+		return fmt.Errorf("configure Enigma: %w", err)
 	}
 	machine := enigma.New(position)
 
 	input, err := os.Open(options.input)
 	if err != nil {
-		return fmt.Errorf("открытие входного файла: %w", err)
+		return fmt.Errorf("open input file: %w", err)
 	}
 	defer input.Close()
 
 	output, err := os.Create(options.output)
 	if err != nil {
-		return fmt.Errorf("создание выходного файла: %w", err)
+		return fmt.Errorf("create output file: %w", err)
 	}
 	defer output.Close()
 
@@ -66,19 +61,19 @@ func execute(options encryptOptions) error {
 				buffer[index] = machine.TransformByte(buffer[index])
 			}
 			if _, err := writer.Write(buffer[:count]); err != nil {
-				return fmt.Errorf("запись выходного файла: %w", err)
+				return fmt.Errorf("write output file: %w", err)
 			}
 		}
 		if readErr == io.EOF {
 			break
 		}
 		if readErr != nil {
-			return fmt.Errorf("чтение входного файла: %w", readErr)
+			return fmt.Errorf("read input file: %w", readErr)
 		}
 	}
 
 	if err := writer.Flush(); err != nil {
-		return fmt.Errorf("сохранение выходного файла: %w", err)
+		return fmt.Errorf("flush output file: %w", err)
 	}
 	return nil
 }
