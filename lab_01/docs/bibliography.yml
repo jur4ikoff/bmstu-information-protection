@@ -1,0 +1,27 @@
+nsa_enigma:
+  type: web
+  title: "Outline of Enigma Machines"
+  author: "National Security Agency"
+  url: "https://www.cryptomuseum.com/crypto/enigma/files/enigma_wiring_catalog.pdf"
+  date: 2026
+
+cryptomuseum_double_step:
+  type: web
+  title: "Enigma: Actions Involved In Double Stepping"
+  author: "Hamer D. H."
+  url: "https://www.cryptomuseum.com/people/hamer/files/double_stepping.pdf"
+  date: 2026
+
+cobra_docs:
+  type: web
+  title: "cobra package"
+  author: "The Cobra Authors"
+  url: "https://pkg.go.dev/github.com/spf13/cobra"
+  date: 2026
+
+go_bufio:
+  type: web
+  title: "bufio package"
+  author: "The Go Authors"
+  url: "https://pkg.go.dev/bufio"
+  date: 2026
