@@ -1,0 +1,27 @@
+rsa_pkcs1:
+  type: web
+  title: "PKCS N 1: RSA Cryptography Specifications Version 2.2"
+  author: "Moriarty K.; Kaliski B.; Jonsson J.; Rusch A."
+  url: "https://www.rfc-editor.org/rfc/rfc8017.html"
+  date: 2016-11
+
+fips197:
+  type: web
+  title: "FIPS 197: Advanced Encryption Standard (AES)"
+  author: "National Institute of Standards and Technology"
+  url: "https://csrc.nist.gov/pubs/fips/197/final"
+  date: 2023
+
+fips180:
+  type: web
+  title: "FIPS 180-4: Secure Hash Standard"
+  author: "National Institute of Standards and Technology"
+  url: "https://csrc.nist.gov/pubs/fips/180-4/upd1/final"
+  date: 2015
+
+python_hashlib:
+  type: web
+  title: "hashlib: Secure hashes and message digests"
+  author: "Python Software Foundation"
+  url: "https://docs.python.org/3/library/hashlib.html#hashlib.pbkdf2_hmac"
+  date: 2026
