@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-
 SHA256_SIZE = 32
 PBKDF2_ITERATIONS = 310_000
 OAEP_LABEL = b"lab-03 RSA session key"
@@ -121,21 +120,30 @@ class PrivateKey:
 
     def to_dict(self) -> dict[str, str]:
         return {
-            "n": str(self.n), "e": str(self.e), "d": str(self.d),
-            "p": str(self.p) if self.p else "", "q": str(self.q) if self.q else "",
+            "n": str(self.n),
+            "e": str(self.e),
+            "d": str(self.d),
+            "p": str(self.p) if self.p else "",
+            "q": str(self.q) if self.q else "",
         }
 
     @classmethod
     def from_dict(cls, data: dict[str, str]) -> "PrivateKey":
-        return cls(int(data["n"]), int(data["d"]), int(data["e"]),
-                   int(data["p"]) if data.get("p") else None,
-                   int(data["q"]) if data.get("q") else None)
+        return cls(
+            int(data["n"]),
+            int(data["d"]),
+            int(data["e"]),
+            int(data["p"]) if data.get("p") else None,
+            int(data["q"]) if data.get("q") else None,
+        )
 
 
 def generate_key_pair(bits: int = 2048) -> tuple[PublicKey, PrivateKey]:
     """Генерирует RSA-ключи. 1024 бита оставлены только для быстрых тестов."""
     if bits < 1024 or bits % 2:
-        raise ValueError("RSA modulus length must be an even number of at least 1024 bits")
+        raise ValueError(
+            "RSA modulus length must be an even number of at least 1024 bits"
+        )
     e = 65537
     while True:
         p, q = _generate_prime(bits // 2), _generate_prime(bits // 2)
@@ -164,7 +172,14 @@ def _rot8(value: int, shift: int) -> int:
 
 def _aes_sbox(value: int) -> int:
     inverse = 0 if value == 0 else _gf_power(value, 254)
-    return inverse ^ _rot8(inverse, 1) ^ _rot8(inverse, 2) ^ _rot8(inverse, 3) ^ _rot8(inverse, 4) ^ 0x63
+    return (
+        inverse
+        ^ _rot8(inverse, 1)
+        ^ _rot8(inverse, 2)
+        ^ _rot8(inverse, 3)
+        ^ _rot8(inverse, 4)
+        ^ 0x63
+    )
 
 
 def _gf_power(value: int, power: int) -> int:
@@ -183,7 +198,7 @@ _SBOX = tuple(_aes_sbox(i) for i in range(256))
 def _expand_aes256_key(key: bytes) -> list[bytes]:
     if len(key) != 32:
         raise ValueError("AES-256 key must contain 32 bytes")
-    words = [list(key[index:index + 4]) for index in range(0, 32, 4)]
+    words = [list(key[index : index + 4]) for index in range(0, 32, 4)]
     rcon = 1
     for index in range(8, 60):
         word = words[index - 1].copy()
@@ -194,7 +209,7 @@ def _expand_aes256_key(key: bytes) -> list[bytes]:
         elif index % 8 == 4:
             word = [_SBOX[item] for item in word]
         words.append([a ^ b for a, b in zip(words[index - 8], word)])
-    return [bytes(sum(words[offset:offset + 4], [])) for offset in range(0, 60, 4)]
+    return [bytes(sum(words[offset : offset + 4], [])) for offset in range(0, 60, 4)]
 
 
 def _aes_block(block: bytes, round_keys: list[bytes]) -> bytes:
@@ -215,8 +230,8 @@ def _aes_block(block: bytes, round_keys: list[bytes]) -> bytes:
     def mix_columns() -> None:
         for column in range(4):
             offset = 4 * column
-            a, b, c, d = state[offset:offset + 4]
-            state[offset:offset + 4] = [
+            a, b, c, d = state[offset : offset + 4]
+            state[offset : offset + 4] = [
                 _gmul(a, 2) ^ _gmul(b, 3) ^ c ^ d,
                 a ^ _gmul(b, 2) ^ _gmul(c, 3) ^ d,
                 a ^ b ^ _gmul(c, 2) ^ _gmul(d, 3),
@@ -227,7 +242,9 @@ def _aes_block(block: bytes, round_keys: list[bytes]) -> bytes:
         substitute()
         shift_rows()
         mix_columns()
-        state = [value ^ round_keys[round_number][index] for index, value in enumerate(state)]
+        state = [
+            value ^ round_keys[round_number][index] for index, value in enumerate(state)
+        ]
     substitute()
     shift_rows()
     return bytes(value ^ round_keys[14][index] for index, value in enumerate(state))
@@ -242,13 +259,15 @@ def aes256_ctr(data: bytes, key: bytes, initial_counter: bytes) -> bytes:
     output = bytearray()
     for offset in range(0, len(data), 16):
         stream = _aes_block(counter.to_bytes(16, "big"), round_keys)
-        output.extend(_xor(data[offset:offset + 16], stream))
+        output.extend(_xor(data[offset : offset + 16], stream))
         counter = (counter + 1) % (1 << 128)
     return bytes(output)
 
 
 # RSA and serialisation ------------------------------------------------------
-def rsa_oaep_encrypt(message: bytes, public_key: PublicKey, label: bytes = OAEP_LABEL) -> bytes:
+def rsa_oaep_encrypt(
+    message: bytes, public_key: PublicKey, label: bytes = OAEP_LABEL
+) -> bytes:
     key_size = public_key.size_bytes
     if len(message) > key_size - 2 * SHA256_SIZE - 2:
         raise ValueError("message is too long for this RSA-OAEP key")
@@ -262,20 +281,24 @@ def rsa_oaep_encrypt(message: bytes, public_key: PublicKey, label: bytes = OAEP_
     return _i2osp(pow(_os2ip(encoded), public_key.e, public_key.n), key_size)
 
 
-def rsa_oaep_decrypt(ciphertext: bytes, private_key: PrivateKey, label: bytes = OAEP_LABEL) -> bytes:
+def rsa_oaep_decrypt(
+    ciphertext: bytes, private_key: PrivateKey, label: bytes = OAEP_LABEL
+) -> bytes:
     key_size = private_key.size_bytes
     if len(ciphertext) != key_size or _os2ip(ciphertext) >= private_key.n:
         raise ValueError("invalid RSA-OAEP ciphertext")
     encoded = _i2osp(pow(_os2ip(ciphertext), private_key.d, private_key.n), key_size)
-    masked_seed, masked_db = encoded[1:1 + SHA256_SIZE], encoded[1 + SHA256_SIZE:]
+    masked_seed, masked_db = encoded[1 : 1 + SHA256_SIZE], encoded[1 + SHA256_SIZE :]
     seed = _xor(masked_seed, _mgf1(masked_db, SHA256_SIZE))
     db = _xor(masked_db, _mgf1(seed, key_size - SHA256_SIZE - 1))
-    valid = encoded[0] == 0 and hmac.compare_digest(db[:SHA256_SIZE], hashlib.sha256(label).digest())
+    valid = encoded[0] == 0 and hmac.compare_digest(
+        db[:SHA256_SIZE], hashlib.sha256(label).digest()
+    )
     separator = db.find(b"\x01", SHA256_SIZE)
     valid = valid and separator >= SHA256_SIZE and not any(db[SHA256_SIZE:separator])
     if not valid:
         raise ValueError("invalid RSA-OAEP ciphertext or label")
-    return db[separator + 1:]
+    return db[separator + 1 :]
 
 
 def sign(data: bytes, private_key: PrivateKey) -> bytes:
@@ -285,7 +308,9 @@ def sign(data: bytes, private_key: PrivateKey) -> bytes:
     if padding_length < 8:
         raise ValueError("RSA key is too short for SHA-256 signature")
     encoded = b"\x00\x01" + b"\xff" * padding_length + b"\x00" + digest_info
-    return _i2osp(pow(_os2ip(encoded), private_key.d, private_key.n), private_key.size_bytes)
+    return _i2osp(
+        pow(_os2ip(encoded), private_key.d, private_key.n), private_key.size_bytes
+    )
 
 
 def verify(data: bytes, signature: bytes, public_key: PublicKey) -> bool:
@@ -294,26 +319,44 @@ def verify(data: bytes, signature: bytes, public_key: PublicKey) -> bool:
     digest_info = _DIGEST_INFO_SHA256 + hashlib.sha256(data).digest()
     padding_length = public_key.size_bytes - len(digest_info) - 3
     expected = b"\x00\x01" + b"\xff" * padding_length + b"\x00" + digest_info
-    recovered = _i2osp(pow(_os2ip(signature), public_key.e, public_key.n), public_key.size_bytes)
+    recovered = _i2osp(
+        pow(_os2ip(signature), public_key.e, public_key.n), public_key.size_bytes
+    )
     return hmac.compare_digest(recovered, expected)
 
 
-def _authenticated_encrypt(data: bytes, key: bytes, context: bytes) -> tuple[bytes, bytes, bytes]:
+def _authenticated_encrypt(
+    data: bytes, key: bytes, context: bytes
+) -> tuple[bytes, bytes, bytes]:
     nonce = secrets.token_bytes(16)
     ciphertext = aes256_ctr(data, key, nonce)
-    tag = hmac.new(hashlib.sha256(b"mac" + key).digest(), context + nonce + ciphertext, hashlib.sha256).digest()
+    tag = hmac.new(
+        hashlib.sha256(b"mac" + key).digest(),
+        context + nonce + ciphertext,
+        hashlib.sha256,
+    ).digest()
     return nonce, ciphertext, tag
 
 
-def _authenticated_decrypt(nonce: bytes, ciphertext: bytes, tag: bytes, key: bytes, context: bytes) -> bytes:
-    expected = hmac.new(hashlib.sha256(b"mac" + key).digest(), context + nonce + ciphertext, hashlib.sha256).digest()
+def _authenticated_decrypt(
+    nonce: bytes, ciphertext: bytes, tag: bytes, key: bytes, context: bytes
+) -> bytes:
+    expected = hmac.new(
+        hashlib.sha256(b"mac" + key).digest(),
+        context + nonce + ciphertext,
+        hashlib.sha256,
+    ).digest()
     if not hmac.compare_digest(tag, expected):
-        raise ValueError("authentication tag is invalid: data was changed or password is wrong")
+        raise ValueError(
+            "authentication tag is invalid: data was changed or password is wrong"
+        )
     return aes256_ctr(ciphertext, key, nonce)
 
 
 def _dump(path: str | Path, magic: str, values: dict[str, Any]) -> None:
-    Path(path).write_text(json.dumps({"format": magic, **values}, sort_keys=True), encoding="utf-8")
+    Path(path).write_text(
+        json.dumps({"format": magic, **values}, sort_keys=True), encoding="utf-8"
+    )
 
 
 def _load(path: str | Path, magic: str) -> dict[str, Any]:
@@ -338,49 +381,103 @@ def save_private_key(path: str | Path, private_key: PrivateKey, password: str) -
     if not password:
         raise ValueError("master password cannot be empty")
     salt = secrets.token_bytes(16)
-    key = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, PBKDF2_ITERATIONS, 32)
+    key = hashlib.pbkdf2_hmac(
+        "sha256", password.encode("utf-8"), salt, PBKDF2_ITERATIONS, 32
+    )
     plaintext = json.dumps(private_key.to_dict(), sort_keys=True).encode("utf-8")
     nonce, ciphertext, tag = _authenticated_encrypt(plaintext, key, b"lab03-private-v1")
-    _dump(path, "lab03-private-v1", {"iterations": PBKDF2_ITERATIONS, "salt": _b64(salt),
-                                      "nonce": _b64(nonce), "ciphertext": _b64(ciphertext), "tag": _b64(tag)})
+    _dump(
+        path,
+        "lab03-private-v1",
+        {
+            "iterations": PBKDF2_ITERATIONS,
+            "salt": _b64(salt),
+            "nonce": _b64(nonce),
+            "ciphertext": _b64(ciphertext),
+            "tag": _b64(tag),
+        },
+    )
 
 
 def load_private_key(path: str | Path, password: str) -> PrivateKey:
     values = _load(path, "lab03-private-v1")
     try:
-        salt, nonce, ciphertext, tag = (_unb64(values[name]) for name in ("salt", "nonce", "ciphertext", "tag"))
+        salt, nonce, ciphertext, tag = (
+            _unb64(values[name]) for name in ("salt", "nonce", "ciphertext", "tag")
+        )
         iterations = int(values["iterations"])
-        key = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations, 32)
-        plaintext = _authenticated_decrypt(nonce, ciphertext, tag, key, b"lab03-private-v1")
+        key = hashlib.pbkdf2_hmac(
+            "sha256", password.encode("utf-8"), salt, iterations, 32
+        )
+        plaintext = _authenticated_decrypt(
+            nonce, ciphertext, tag, key, b"lab03-private-v1"
+        )
         return PrivateKey.from_dict(json.loads(plaintext.decode("utf-8")))
-    except (KeyError, TypeError, ValueError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise ValueError("unable to decrypt private key: wrong password or damaged file") from exc
+    except (
+        KeyError,
+        TypeError,
+        ValueError,
+        UnicodeDecodeError,
+        json.JSONDecodeError,
+    ) as exc:
+        raise ValueError(
+            "unable to decrypt private key: wrong password or damaged file"
+        ) from exc
 
 
-def encrypt_file(source: str | Path, destination: str | Path, public_key: PublicKey) -> None:
+def encrypt_file(
+    source: str | Path, destination: str | Path, public_key: PublicKey
+) -> None:
     session_key = secrets.token_bytes(32)
     plaintext = Path(source).read_bytes()
-    nonce, ciphertext, tag = _authenticated_encrypt(plaintext, session_key, b"lab03-file-v1")
-    _dump(destination, "lab03-envelope-v1", {"encrypted_key": _b64(rsa_oaep_encrypt(session_key, public_key)),
-                                               "nonce": _b64(nonce), "ciphertext": _b64(ciphertext), "tag": _b64(tag)})
+    nonce, ciphertext, tag = _authenticated_encrypt(
+        plaintext, session_key, b"lab03-file-v1"
+    )
+    _dump(
+        destination,
+        "lab03-envelope-v1",
+        {
+            "encrypted_key": _b64(rsa_oaep_encrypt(session_key, public_key)),
+            "nonce": _b64(nonce),
+            "ciphertext": _b64(ciphertext),
+            "tag": _b64(tag),
+        },
+    )
 
 
-def decrypt_file(source: str | Path, destination: str | Path, private_key: PrivateKey) -> None:
+def decrypt_file(
+    source: str | Path, destination: str | Path, private_key: PrivateKey
+) -> None:
     values = _load(source, "lab03-envelope-v1")
     try:
         session_key = rsa_oaep_decrypt(_unb64(values["encrypted_key"]), private_key)
-        plaintext = _authenticated_decrypt(_unb64(values["nonce"]), _unb64(values["ciphertext"]),
-                                           _unb64(values["tag"]), session_key, b"lab03-file-v1")
+        plaintext = _authenticated_decrypt(
+            _unb64(values["nonce"]),
+            _unb64(values["ciphertext"]),
+            _unb64(values["tag"]),
+            session_key,
+            b"lab03-file-v1",
+        )
     except (KeyError, TypeError, ValueError) as exc:
-        raise ValueError("unable to decrypt file: incorrect key or damaged envelope") from exc
+        raise ValueError(
+            "unable to decrypt file: incorrect key or damaged envelope"
+        ) from exc
     Path(destination).write_bytes(plaintext)
 
 
-def sign_file(source: str | Path, signature_path: str | Path, private_key: PrivateKey) -> None:
-    _dump(signature_path, "lab03-signature-v1", {"signature": _b64(sign(Path(source).read_bytes(), private_key))})
+def sign_file(
+    source: str | Path, signature_path: str | Path, private_key: PrivateKey
+) -> None:
+    _dump(
+        signature_path,
+        "lab03-signature-v1",
+        {"signature": _b64(sign(Path(source).read_bytes(), private_key))},
+    )
 
 
-def verify_file(source: str | Path, signature_path: str | Path, public_key: PublicKey) -> bool:
+def verify_file(
+    source: str | Path, signature_path: str | Path, public_key: PublicKey
+) -> bool:
     try:
         signature = _unb64(_load(signature_path, "lab03-signature-v1")["signature"])
     except (KeyError, TypeError, ValueError):

@@ -10,9 +10,17 @@ from __future__ import annotations
 import argparse
 import getpass
 
-from rsa_crypto import (decrypt_file, encrypt_file, generate_key_pair, load_private_key,
-                        load_public_key, save_private_key, save_public_key, sign_file,
-                        verify_file)
+from rsa_crypto import (
+    decrypt_file,
+    encrypt_file,
+    generate_key_pair,
+    load_private_key,
+    load_public_key,
+    save_private_key,
+    save_public_key,
+    sign_file,
+    verify_file,
+)
 
 
 def _password(confirm: bool = False) -> str:
@@ -23,12 +31,16 @@ def _password(confirm: bool = False) -> str:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="ЛР №3: RSA, AES и электронная подпись")
+    parser = argparse.ArgumentParser(
+        description="ЛР №3: RSA, AES и электронная подпись"
+    )
     commands = parser.add_subparsers(dest="command", required=True)
     keygen = commands.add_parser("keygen", help="создать RSA-ключи")
     keygen.add_argument("public_key")
     keygen.add_argument("private_key")
-    keygen.add_argument("--bits", type=int, default=2048, help="размер RSA, по умолчанию 2048")
+    keygen.add_argument(
+        "--bits", type=int, default=2048, help="размер RSA, по умолчанию 2048"
+    )
     for name in ("encrypt", "decrypt", "sign", "verify"):
         item = commands.add_parser(name)
         item.add_argument("key")
@@ -48,10 +60,14 @@ def main() -> int:
         encrypt_file(args.source, args.destination, load_public_key(args.key))
         print("Файл зашифрован.")
     elif args.command == "decrypt":
-        decrypt_file(args.source, args.destination, load_private_key(args.key, _password()))
+        decrypt_file(
+            args.source, args.destination, load_private_key(args.key, _password())
+        )
         print("Файл расшифрован.")
     elif args.command == "sign":
-        sign_file(args.source, args.destination, load_private_key(args.key, _password()))
+        sign_file(
+            args.source, args.destination, load_private_key(args.key, _password())
+        )
         print("Подпись создана.")
     else:
         valid = verify_file(args.source, args.destination, load_public_key(args.key))

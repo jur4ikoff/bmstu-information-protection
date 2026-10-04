@@ -1,0 +1,52 @@
+rsa_pkcs1:
+  type: web
+  title: "PKCS N 1: RSA Cryptography Specifications Version 2.2"
+  author: "Moriarty K.; Kaliski B.; Jonsson J.; Rusch A."
+  url: "https://www.rfc-editor.org/rfc/rfc8017.html"
+  date: 2016-11
+
+rsa1978:
+  type: article
+  title: "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems"
+  author:
+    - "Rivest R. L."
+    - "Shamir A."
+    - "Adleman L."
+  parent:
+    title: "Communications of the ACM"
+    volume: 21
+    issue: 2
+  page-range: 120-126
+  date: 1978
+
+miller1976:
+  type: article
+  title: "Riemann's Hypothesis and Tests for Primality"
+  author: "Miller G. L."
+  parent:
+    title: "Journal of Computer and System Sciences"
+    volume: 13
+    issue: 3
+  page-range: 300-317
+  date: 1976
+
+fips197:
+  type: web
+  title: "FIPS 197: Advanced Encryption Standard (AES)"
+  author: "National Institute of Standards and Technology"
+  url: "https://csrc.nist.gov/pubs/fips/197/final"
+  date: 2023
+
+fips180:
+  type: web
+  title: "FIPS 180-4: Secure Hash Standard"
+  author: "National Institute of Standards and Technology"
+  url: "https://csrc.nist.gov/pubs/fips/180-4/upd1/final"
+  date: 2015
+
+python_hashlib:
+  type: web
+  title: "hashlib: Secure hashes and message digests"
+  author: "Python Software Foundation"
+  url: "https://docs.python.org/3/library/hashlib.html#hashlib.pbkdf2_hmac"
+  date: 2026
