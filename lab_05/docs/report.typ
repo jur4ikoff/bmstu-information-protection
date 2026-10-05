@@ -115,7 +115,7 @@ AES-256 выполняется соответственно 10, 12 и 14 рау�
 подтверждает побайтное совпадение файлов.
 
 #figure(
-  image("images/console-session-flat.png", width: 100%),
+  image("images/image.png", width: 100%),
   caption: [Вывод консоли при проверке программы],
 )<console>
 
