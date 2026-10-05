@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="490" viewBox="0 0 1600 490">
+  <rect width="1600" height="490" rx="18" fill="#1e1e1e"/>
+  <circle cx="36" cy="34" r="10" fill="#ff5f57"/><circle cx="68" cy="34" r="10" fill="#febc2e"/><circle cx="100" cy="34" r="10" fill="#28c840"/>
+  <text x="35" y="90" fill="#d4d4d4" font-family="Menlo, Monaco, monospace" font-size="19">
+    <tspan x="35" dy="0">$ python3 src/main.py keygen --public public.pem --private private.pem --password test-password</tspan>
+    <tspan x="35" dy="48" fill="#b5cea8">Ключи сохранены за 1.97 с.</tspan>
+    <tspan x="35" dy="66" fill="#d4d4d4">$ python3 src/main.py encrypt --key public.pem --in source.rar --out source.enc</tspan>
+    <tspan x="35" dy="48" fill="#b5cea8">Файл зашифрован: HYB1 / RSA-OAEP / AES-256-GCM.</tspan>
+    <tspan x="35" dy="66" fill="#d4d4d4">$ python3 src/main.py decrypt --key private.pem --in source.enc --out restored.rar --password test-password</tspan>
+    <tspan x="35" dy="48" fill="#b5cea8">Файл расшифрован; SHA-256: 66b2cdcfbcb7b093b1d989df9914e2cf9f1cdb8c5763554bd81aac88acd302a4</tspan>
+    <tspan x="35" dy="66" fill="#d4d4d4">$ cmp source.rar restored.rar</tspan>
+    <tspan x="35" dy="48" fill="#b5cea8">$</tspan>
+  </text>
+</svg>
