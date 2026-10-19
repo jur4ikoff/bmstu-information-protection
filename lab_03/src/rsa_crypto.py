@@ -2,6 +2,14 @@
 
 Модуль не требует сторонних пакетов. Форматы файлов являются форматом этой
 работы и не предназначены для совместимости с OpenSSL или другими утилитами.
+
+Основной сценарий гибридного шифрования:
+1. :func:`encrypt_file` создаёт случайный 32-байтный ключ AES.
+2. Этим ключом AES-256-CTR шифруется содержимое файла.
+3. Тот же ключ AES шифруется открытым RSA-ключом функцией
+   :func:`rsa_oaep_encrypt`.
+4. :func:`decrypt_file` закрытым RSA-ключом возвращает AES-ключ и им
+   восстанавливает содержимое файла.
 """
 
 from __future__ import annotations
@@ -41,6 +49,7 @@ def _os2ip(value: bytes) -> int:
 
 
 def _mgf1(seed: bytes, length: int) -> bytes:
+    """Создаёт маску для схемы дополнения RSA-OAEP на основе SHA-256."""
     result = bytearray()
     for counter in range(math.ceil(length / SHA256_SIZE)):
         result.extend(hashlib.sha256(seed + _i2osp(counter, 4)).digest())
@@ -79,6 +88,7 @@ def is_probable_prime(candidate: int, rounds: int = 40) -> bool:
 
 
 def _generate_prime(bits: int) -> int:
+    """Подбирает случайное вероятно простое число нужной длины для RSA."""
     while True:
         value = secrets.randbits(bits) | (1 << (bits - 1)) | 1
         if is_probable_prime(value):
@@ -87,6 +97,10 @@ def _generate_prime(bits: int) -> int:
 
 @dataclass(frozen=True)
 class PublicKey:
+    """Открытая часть RSA: модуль ``n`` и показатель ``e``.
+
+    Её можно передавать другим: ею шифруют сеансовый AES-ключ и проверяют ЭЦП.
+    """
     n: int
     e: int = 65537
 
@@ -104,6 +118,11 @@ class PublicKey:
 
 @dataclass(frozen=True)
 class PrivateKey:
+    """Закрытая часть RSA: ``d`` и исходные простые числа ``p`` и ``q``.
+
+    Этот ключ нельзя передавать. Он расшифровывает сеансовый AES-ключ и
+    создаёт ЭЦП.
+    """
     n: int
     d: int
     e: int = 65537
@@ -139,7 +158,11 @@ class PrivateKey:
 
 
 def generate_key_pair(bits: int = 2048) -> tuple[PublicKey, PrivateKey]:
-    """Генерирует RSA-ключи. 1024 бита оставлены только для быстрых тестов."""
+    """Генерирует связанную пару RSA-ключей.
+
+    Здесь выбираются простые ``p`` и ``q``, вычисляется ``n = p * q`` и
+    закрытый показатель ``d``. 1024 бита оставлены только для быстрых тестов.
+    """
     if bits < 1024 or bits % 2:
         raise ValueError(
             "RSA modulus length must be an even number of at least 1024 bits"
@@ -196,6 +219,7 @@ _SBOX = tuple(_aes_sbox(i) for i in range(256))
 
 
 def _expand_aes256_key(key: bytes) -> list[bytes]:
+    """Разворачивает один 256-битный ключ AES в 15 раундовых ключей."""
     if len(key) != 32:
         raise ValueError("AES-256 key must contain 32 bytes")
     words = [list(key[index : index + 4]) for index in range(0, 32, 4)]
@@ -213,6 +237,7 @@ def _expand_aes256_key(key: bytes) -> list[bytes]:
 
 
 def _aes_block(block: bytes, round_keys: list[bytes]) -> bytes:
+    """Шифрует один 16-байтный блок алгоритмом AES-256."""
     if len(block) != 16:
         raise ValueError("AES operates on 16-byte blocks")
     state = [value ^ round_keys[0][index] for index, value in enumerate(block)]
@@ -251,7 +276,12 @@ def _aes_block(block: bytes, round_keys: list[bytes]) -> bytes:
 
 
 def aes256_ctr(data: bytes, key: bytes, initial_counter: bytes) -> bytes:
-    """AES-256 in CTR mode; encryption and decryption are the same operation."""
+    """Преобразует данные в режиме AES-256-CTR.
+
+    В CTR-режиме шифрование и расшифрование — одна операция XOR с одинаковым
+    потоком: вызов с теми же ``key`` и ``initial_counter`` восстанавливает
+    исходные байты.
+    """
     if len(initial_counter) != 16:
         raise ValueError("CTR counter must contain 16 bytes")
     round_keys = _expand_aes256_key(key)
@@ -264,10 +294,15 @@ def aes256_ctr(data: bytes, key: bytes, initial_counter: bytes) -> bytes:
     return bytes(output)
 
 
-# RSA and serialisation ------------------------------------------------------
+# RSA-OAEP: применяется только к короткому сеансовому AES-ключу, не к файлу. --
 def rsa_oaep_encrypt(
     message: bytes, public_key: PublicKey, label: bytes = OAEP_LABEL
 ) -> bytes:
+    """Шифрует короткое сообщение открытым RSA-ключом по схеме OAEP.
+
+    В этой работе ``message`` — именно 32-байтный AES-ключ из
+    :func:`encrypt_file`.
+    """
     key_size = public_key.size_bytes
     if len(message) > key_size - 2 * SHA256_SIZE - 2:
         raise ValueError("message is too long for this RSA-OAEP key")
@@ -284,6 +319,10 @@ def rsa_oaep_encrypt(
 def rsa_oaep_decrypt(
     ciphertext: bytes, private_key: PrivateKey, label: bytes = OAEP_LABEL
 ) -> bytes:
+    """Расшифровывает OAEP-контейнер закрытым RSA-ключом.
+
+    В результате возвращается исходный сеансовый AES-ключ, а не файл.
+    """
     key_size = private_key.size_bytes
     if len(ciphertext) != key_size or _os2ip(ciphertext) >= private_key.n:
         raise ValueError("invalid RSA-OAEP ciphertext")
@@ -328,6 +367,7 @@ def verify(data: bytes, signature: bytes, public_key: PublicKey) -> bool:
 def _authenticated_encrypt(
     data: bytes, key: bytes, context: bytes
 ) -> tuple[bytes, bytes, bytes]:
+    """Шифрует ``data`` AES-CTR и добавляет HMAC-тег от изменения данных."""
     nonce = secrets.token_bytes(16)
     ciphertext = aes256_ctr(data, key, nonce)
     tag = hmac.new(
@@ -341,6 +381,11 @@ def _authenticated_encrypt(
 def _authenticated_decrypt(
     nonce: bytes, ciphertext: bytes, tag: bytes, key: bytes, context: bytes
 ) -> bytes:
+    """Сначала проверяет HMAC, затем расшифровывает AES-CTR.
+
+    Проверка выполняется до расшифрования: подменённый контейнер не будет
+    принят за корректный файл.
+    """
     expected = hmac.new(
         hashlib.sha256(b"mac" + key).digest(),
         context + nonce + ciphertext,
@@ -354,12 +399,14 @@ def _authenticated_decrypt(
 
 
 def _dump(path: str | Path, magic: str, values: dict[str, Any]) -> None:
+    """Сохраняет данные контейнера в JSON, кодируя байты вызывающей стороной."""
     Path(path).write_text(
         json.dumps({"format": magic, **values}, sort_keys=True), encoding="utf-8"
     )
 
 
 def _load(path: str | Path, magic: str) -> dict[str, Any]:
+    """Читает JSON-контейнер и проверяет, что он имеет ожидаемый формат."""
     try:
         result = json.loads(Path(path).read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -370,14 +417,22 @@ def _load(path: str | Path, magic: str) -> dict[str, Any]:
 
 
 def save_public_key(path: str | Path, public_key: PublicKey) -> None:
+    """Сохраняет открытую часть RSA-ключа в ``public.json``-подобный файл."""
     _dump(path, "lab03-public-v1", public_key.to_dict())
 
 
 def load_public_key(path: str | Path) -> PublicKey:
+    """Загружает открытый RSA-ключ из JSON-контейнера."""
     return PublicKey.from_dict(_load(path, "lab03-public-v1"))
 
 
 def save_private_key(path: str | Path, private_key: PrivateKey, password: str) -> None:
+    """Защищает закрытый RSA-ключ паролем и записывает его на диск.
+
+    Пароль преобразуется PBKDF2 в AES-ключ. Затем сериализованный закрытый
+    RSA-ключ шифруется AES-CTR и снабжается HMAC. Это отдельное шифрование:
+    оно защищает файл ``private.json``, а не пользовательский файл.
+    """
     if not password:
         raise ValueError("master password cannot be empty")
     salt = secrets.token_bytes(16)
@@ -400,6 +455,7 @@ def save_private_key(path: str | Path, private_key: PrivateKey, password: str) -
 
 
 def load_private_key(path: str | Path, password: str) -> PrivateKey:
+    """По паролю расшифровывает ``private.json`` и возвращает RSA-ключ."""
     values = _load(path, "lab03-private-v1")
     try:
         salt, nonce, ciphertext, tag = (
@@ -428,8 +484,16 @@ def load_private_key(path: str | Path, password: str) -> PrivateKey:
 def encrypt_file(
     source: str | Path, destination: str | Path, public_key: PublicKey
 ) -> None:
+    """Создаёт гибридный контейнер с зашифрованным файлом.
+
+    Файл шифрует AES, потому что он быстро работает с любым объёмом данных.
+    RSA шифрует только случайный AES-ключ, чтобы его мог восстановить лишь
+    владелец закрытого RSA-ключа.
+    """
+    # 1. Одноразовый 256-битный ключ будет использоваться только для этого файла.
     session_key = secrets.token_bytes(32)
     plaintext = Path(source).read_bytes()
+    # 2. Здесь происходит ШИФРОВАНИЕ СОДЕРЖИМОГО ФАЙЛА алгоритмом AES-256-CTR.
     nonce, ciphertext, tag = _authenticated_encrypt(
         plaintext, session_key, b"lab03-file-v1"
     )
@@ -437,6 +501,7 @@ def encrypt_file(
         destination,
         "lab03-envelope-v1",
         {
+            # 3. Здесь RSA-OAEP шифрует не файл, а только 32-байтный AES-ключ.
             "encrypted_key": _b64(rsa_oaep_encrypt(session_key, public_key)),
             "nonce": _b64(nonce),
             "ciphertext": _b64(ciphertext),
@@ -448,9 +513,16 @@ def encrypt_file(
 def decrypt_file(
     source: str | Path, destination: str | Path, private_key: PrivateKey
 ) -> None:
+    """Восстанавливает файл из гибридного контейнера.
+
+    Сначала RSA закрытым ключом восстанавливает сеансовый AES-ключ; после
+    проверки HMAC этим ключом AES расшифровывается содержимое файла.
+    """
     values = _load(source, "lab03-envelope-v1")
     try:
+        # 1. Здесь происходит РАСШИФРОВАНИЕ AES-ключа закрытым RSA-ключом.
         session_key = rsa_oaep_decrypt(_unb64(values["encrypted_key"]), private_key)
+        # 2. Здесь AES-256-CTR расшифровывает собственно содержимое файла.
         plaintext = _authenticated_decrypt(
             _unb64(values["nonce"]),
             _unb64(values["ciphertext"]),
@@ -468,6 +540,7 @@ def decrypt_file(
 def sign_file(
     source: str | Path, signature_path: str | Path, private_key: PrivateKey
 ) -> None:
+    """Создаёт RSA-подпись SHA-256 для файла (это не шифрование файла)."""
     _dump(
         signature_path,
         "lab03-signature-v1",
@@ -478,6 +551,7 @@ def sign_file(
 def verify_file(
     source: str | Path, signature_path: str | Path, public_key: PublicKey
 ) -> bool:
+    """Проверяет RSA-подпись файла открытым ключом и возвращает результат."""
     try:
         signature = _unb64(_load(signature_path, "lab03-signature-v1")["signature"])
     except (KeyError, TypeError, ValueError):
