@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560">
+<rect width="100%" height="100%" fill="white"/>
+<g font-family="sans-serif" font-size="13">
+<text x="65" y="28" font-size="20">Исходный текст</text>
+<path d="M 65 450.0 H 1070" stroke="#ddd"/>
+<text x="57" y="454.0" text-anchor="end">0.0%</text>
+<path d="M 65 378.0 H 1070" stroke="#ddd"/>
+<text x="57" y="382.0" text-anchor="end">2.5%</text>
+<path d="M 65 306.0 H 1070" stroke="#ddd"/>
+<text x="57" y="310.0" text-anchor="end">5.0%</text>
+<path d="M 65 234.0 H 1070" stroke="#ddd"/>
+<text x="57" y="238.0" text-anchor="end">7.5%</text>
+<path d="M 65 162.00000000000003 H 1070" stroke="#ddd"/>
+<text x="57" y="166.00000000000003" text-anchor="end">10.0%</text>
+<path d="M 65 90.0 H 1070" stroke="#ddd"/>
+<text x="57" y="94.0" text-anchor="end">12.5%</text>
+<text transform="translate(80.703125,468) rotate(60)">А</text>
+<text transform="translate(112.109375,468) rotate(60)">Б</text>
+<text transform="translate(143.515625,468) rotate(60)">В</text>
+<text transform="translate(174.921875,468) rotate(60)">Г</text>
+<text transform="translate(206.328125,468) rotate(60)">Д</text>
+<text transform="translate(237.734375,468) rotate(60)">Е</text>
+<text transform="translate(269.140625,468) rotate(60)">Ж</text>
+<text transform="translate(300.546875,468) rotate(60)">З</text>
+<text transform="translate(331.953125,468) rotate(60)">И</text>
+<text transform="translate(363.359375,468) rotate(60)">Й</text>
+<text transform="translate(394.765625,468) rotate(60)">К</text>
+<text transform="translate(426.171875,468) rotate(60)">Л</text>
+<text transform="translate(457.578125,468) rotate(60)">М</text>
+<text transform="translate(488.984375,468) rotate(60)">Н</text>
+<text transform="translate(520.390625,468) rotate(60)">О</text>
+<text transform="translate(551.796875,468) rotate(60)">П</text>
+<text transform="translate(583.203125,468) rotate(60)">Р</text>
+<text transform="translate(614.609375,468) rotate(60)">С</text>
+<text transform="translate(646.015625,468) rotate(60)">Т</text>
+<text transform="translate(677.421875,468) rotate(60)">У</text>
+<text transform="translate(708.828125,468) rotate(60)">Ф</text>
+<text transform="translate(740.234375,468) rotate(60)">Х</text>
+<text transform="translate(771.640625,468) rotate(60)">Ц</text>
+<text transform="translate(803.046875,468) rotate(60)">Ч</text>
+<text transform="translate(834.453125,468) rotate(60)">Ш</text>
+<text transform="translate(865.859375,468) rotate(60)">Щ</text>
+<text transform="translate(897.265625,468) rotate(60)">Ъ</text>
+<text transform="translate(928.671875,468) rotate(60)">Ы</text>
+<text transform="translate(960.078125,468) rotate(60)">Ь</text>
+<text transform="translate(991.484375,468) rotate(60)">Э</text>
+<text transform="translate(1022.890625,468) rotate(60)">Ю</text>
+<text transform="translate(1054.296875,468) rotate(60)">Я</text>
+<text x="65" y="60" fill="#2563eb">Исходный текст</text>
+<rect x="68.140625" y="235.45838533166943" width="25.125" height="214.54161466833057" fill="#2563eb"/>
+<rect x="99.546875" y="412.19256983776523" width="25.125" height="37.807430162234766" fill="#2563eb"/>
+<rect x="130.953125" y="334.9880003839877" width="25.125" height="115.0119996160123" fill="#2563eb"/>
+<rect x="162.359375" y="412.91830661418834" width="25.125" height="37.08169338581166" fill="#2563eb"/>
+<rect x="193.765625" y="359.5939329941442" width="25.125" height="90.40606700585579" fill="#2563eb"/>
+<rect x="225.171875" y="202.59287702793512" width="25.125" height="247.40712297206488" fill="#2563eb"/>
+<rect x="256.578125" y="423.2514159546895" width="25.125" height="26.74858404531051" fill="#2563eb"/>
+<rect x="287.984375" y="394.67121052126333" width="25.125" height="55.32878947873667" fill="#2563eb"/>
+<rect x="319.390625" y="221.3929154267064" width="25.125" height="228.6070845732936" fill="#2563eb"/>
+<rect x="350.796875" y="421.73082461361236" width="25.125" height="28.269175386387644" fill="#2563eb"/>
+<rect x="382.203125" y="371.2057214169147" width="25.125" height="78.79427858308532" fill="#2563eb"/>
+<rect x="413.609375" y="301.2239608332534" width="25.125" height="148.7760391667466" fill="#2563eb"/>
+<rect x="445.015625" y="364.50129595852934" width="25.125" height="85.49870404147066" fill="#2563eb"/>
+<rect x="476.421875" y="252.66871460113276" width="25.125" height="197.33128539886724" fill="#2563eb"/>
+<rect x="507.828125" y="122.72727272727275" width="25.125" height="327.27272727272725" fill="#2563eb"/>
+<rect x="539.234375" y="356.72554478256694" width="25.125" height="93.27445521743306" fill="#2563eb"/>
+<rect x="570.640625" y="309.5872132091773" width="25.125" height="140.41278679082268" fill="#2563eb"/>
+<rect x="602.046875" y="296.4202745512144" width="25.125" height="153.5797254487856" fill="#2563eb"/>
+<rect x="633.453125" y="267.7709513295575" width="25.125" height="182.22904867044252" fill="#2563eb"/>
+<rect x="664.859375" y="383.8197177690314" width="25.125" height="66.1802822309686" fill="#2563eb"/>
+<rect x="696.265625" y="444.43601804742246" width="25.125" height="5.563981952577535" fill="#2563eb"/>
+<rect x="727.671875" y="429.7139291542671" width="25.125" height="20.286070845732922" fill="#2563eb"/>
+<rect x="759.078125" y="442.9154267063454" width="25.125" height="7.084573293654614" fill="#2563eb"/>
+<rect x="790.484375" y="405.0734376499952" width="25.125" height="44.926562350004815" fill="#2563eb"/>
+<rect x="821.890625" y="424.8756839781127" width="25.125" height="25.124316021887296" fill="#2563eb"/>
+<rect x="853.296875" y="439.73600844772966" width="25.125" height="10.26399155227034" fill="#2563eb"/>
+<rect x="884.703125" y="448.44484976480754" width="25.125" height="1.5551502351924569" fill="#2563eb"/>
+<rect x="916.109375" y="377.5299990400307" width="25.125" height="72.4700009599693" fill="#2563eb"/>
+<rect x="947.515625" y="392.56311798022466" width="25.125" height="57.43688201977534" fill="#2563eb"/>
+<rect x="978.921875" y="446.02572717673036" width="25.125" height="3.9742728232696436" fill="#2563eb"/>
+<rect x="1010.328125" y="430.1631947777671" width="25.125" height="19.836805222232897" fill="#2563eb"/>
+<rect x="1041.734375" y="393.15061918018625" width="25.125" height="56.849380819813746" fill="#2563eb"/>
+</g></svg>

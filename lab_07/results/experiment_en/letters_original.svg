@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560">
+<rect width="100%" height="100%" fill="white"/>
+<g font-family="sans-serif" font-size="13">
+<text x="65" y="28" font-size="20">Исходный текст</text>
+<path d="M 65 450.0 H 1070" stroke="#ddd"/>
+<text x="57" y="454.0" text-anchor="end">0.0%</text>
+<path d="M 65 378.0 H 1070" stroke="#ddd"/>
+<text x="57" y="382.0" text-anchor="end">3.2%</text>
+<path d="M 65 306.0 H 1070" stroke="#ddd"/>
+<text x="57" y="310.0" text-anchor="end">6.4%</text>
+<path d="M 65 233.99999999999997 H 1070" stroke="#ddd"/>
+<text x="57" y="237.99999999999997" text-anchor="end">9.6%</text>
+<path d="M 65 162.0 H 1070" stroke="#ddd"/>
+<text x="57" y="166.0" text-anchor="end">12.8%</text>
+<path d="M 65 90.0 H 1070" stroke="#ddd"/>
+<text x="57" y="94.0" text-anchor="end">16.0%</text>
+<text transform="translate(84.32692307692308,468) rotate(60)">A</text>
+<text transform="translate(122.98076923076923,468) rotate(60)">B</text>
+<text transform="translate(161.6346153846154,468) rotate(60)">C</text>
+<text transform="translate(200.28846153846155,468) rotate(60)">D</text>
+<text transform="translate(238.94230769230768,468) rotate(60)">E</text>
+<text transform="translate(277.5961538461538,468) rotate(60)">F</text>
+<text transform="translate(316.25,468) rotate(60)">G</text>
+<text transform="translate(354.90384615384613,468) rotate(60)">H</text>
+<text transform="translate(393.5576923076923,468) rotate(60)">I</text>
+<text transform="translate(432.21153846153845,468) rotate(60)">J</text>
+<text transform="translate(470.8653846153846,468) rotate(60)">K</text>
+<text transform="translate(509.5192307692308,468) rotate(60)">L</text>
+<text transform="translate(548.1730769230769,468) rotate(60)">M</text>
+<text transform="translate(586.8269230769231,468) rotate(60)">N</text>
+<text transform="translate(625.4807692307692,468) rotate(60)">O</text>
+<text transform="translate(664.1346153846154,468) rotate(60)">P</text>
+<text transform="translate(702.7884615384615,468) rotate(60)">Q</text>
+<text transform="translate(741.4423076923077,468) rotate(60)">R</text>
+<text transform="translate(780.0961538461538,468) rotate(60)">S</text>
+<text transform="translate(818.75,468) rotate(60)">T</text>
+<text transform="translate(857.4038461538462,468) rotate(60)">U</text>
+<text transform="translate(896.0576923076923,468) rotate(60)">V</text>
+<text transform="translate(934.7115384615385,468) rotate(60)">W</text>
+<text transform="translate(973.3653846153846,468) rotate(60)">X</text>
+<text transform="translate(1012.0192307692307,468) rotate(60)">Y</text>
+<text transform="translate(1050.673076923077,468) rotate(60)">Z</text>
+<text x="65" y="60" fill="#2563eb">Исходный текст</text>
+<rect x="68.86538461538461" y="267.71007700033476" width="30.923076923076923" height="182.28992299966524" fill="#2563eb"/>
+<rect x="107.51923076923077" y="420.6363940712786" width="30.923076923076923" height="29.363605928721427" fill="#2563eb"/>
+<rect x="146.1730769230769" y="384.2058008947865" width="30.923076923076923" height="65.79419910521352" fill="#2563eb"/>
+<rect x="184.8269230769231" y="350.67869860303745" width="30.923076923076923" height="99.32130139696255" fill="#2563eb"/>
+<rect x="223.48076923076923" y="122.72727272727275" width="30.923076923076923" height="327.27272727272725" fill="#2563eb"/>
+<rect x="262.13461538461536" y="416.55507197857384" width="30.923076923076923" height="33.444928021426165" fill="#2563eb"/>
+<rect x="300.78846153846155" y="407.4337279727303" width="30.923076923076923" height="42.56627202726969" fill="#2563eb"/>
+<rect x="339.4423076923077" y="350.70609002647836" width="30.923076923076923" height="99.29390997352164" fill="#2563eb"/>
+<rect x="378.0961538461538" y="327.3959886782116" width="30.923076923076923" height="122.60401132178839" fill="#2563eb"/>
+<rect x="416.75" y="446.9595519980522" width="30.923076923076923" height="3.040448001947823" fill="#2563eb"/>
+<rect x="455.40384615384613" y="431.75731198831295" width="30.923076923076923" height="18.24268801168705" fill="#2563eb"/>
+<rect x="494.05769230769226" y="359.88221687920384" width="30.923076923076923" height="90.11778312079616" fill="#2563eb"/>
+<rect x="532.7115384615385" y="386.20537480597744" width="30.923076923076923" height="63.79462519402256" fill="#2563eb"/>
+<rect x="571.3653846153845" y="281.8440514958761" width="30.923076923076923" height="168.1559485041239" fill="#2563eb"/>
+<rect x="610.0192307692307" y="292.9649694129105" width="30.923076923076923" height="157.03503058708952" fill="#2563eb"/>
+<rect x="648.6730769230769" y="395.27193596493896" width="30.923076923076923" height="54.72806403506104" fill="#2563eb"/>
+<rect x="687.3269230769231" y="443.91910399610435" width="30.923076923076923" height="6.080896003895646" fill="#2563eb"/>
+<rect x="725.9807692307693" y="315.2889795173022" width="30.923076923076923" height="134.7110204826978" fill="#2563eb"/>
+<rect x="764.6346153846155" y="282.857534163192" width="30.923076923076923" height="167.14246583680801" fill="#2563eb"/>
+<rect x="803.2884615384615" y="238.23690537784944" width="30.923076923076923" height="211.76309462215056" fill="#2563eb"/>
+<rect x="841.9423076923077" y="383.2197096509115" width="30.923076923076923" height="66.78029034908849" fill="#2563eb"/>
+<rect x="880.5961538461539" y="426.7172900751742" width="30.923076923076923" height="23.28270992482578" fill="#2563eb"/>
+<rect x="919.25" y="410.47417597467813" width="30.923076923076923" height="39.52582402532187" fill="#2563eb"/>
+<rect x="957.9038461538462" y="443.91910399610435" width="30.923076923076923" height="6.080896003895646" fill="#2563eb"/>
+<rect x="996.5576923076924" y="413.54201540006693" width="30.923076923076923" height="36.45798459993307" fill="#2563eb"/>
+<rect x="1035.2115384615386" y="450.0" width="30.923076923076923" height="0.0" fill="#2563eb"/>
+</g></svg>

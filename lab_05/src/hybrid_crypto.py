@@ -1,4 +1,4 @@
-"""Streaming RSA-OAEP + AES-256-GCM implementation for laboratory work 5."""
+"""ЛР 5, вариант 3: RSA-2048-OAEP + AES-256-CBC + HMAC-SHA256."""
 
 from __future__ import annotations
 
@@ -13,7 +13,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 MAGIC = b"HYB1"
-NONCE_SIZE, TAG_SIZE, AES256_KEY_SIZE = 12, 16, 32
+BLOCK_SIZE, IV_SIZE, TAG_SIZE, AES256_KEY_SIZE = 16, 16, 32, 32
+HMAC_KEY_SIZE, RSA_BITS = 32, 2048
 SHA256_SIZE, PBKDF2_ITERATIONS, BUFFER_SIZE = 32, 310_000, 64 * 1024
 
 
@@ -111,14 +112,16 @@ class PrivateKey:
 
 
 def generate_key_pair(bits: int = 2048) -> tuple[PublicKey, PrivateKey]:
-    """A 1024-bit key is permitted here only for fast unit tests; CLI requires 2048."""
-    if bits < 1024 or bits % 2:
-        raise ValueError("RSA size must be even and at least 1024 bits")
+    """Вариант 3 требует модуль ровно 2048 бит."""
+    if bits != RSA_BITS:
+        raise ValueError("variant 3 requires a 2048-bit RSA modulus")
     while True:
         p, q = _generate_prime(bits // 2), _generate_prime(bits // 2)
         phi = (p - 1) * (q - 1)
         if p != q and math.gcd(65537, phi) == 1:
             n = p * q
+            if n.bit_length() != bits:
+                continue
             d = mod_inverse(65537, phi)
             return PublicKey(n), PrivateKey(n, d, 65537, p, q)
 
@@ -518,89 +521,140 @@ def _temporary(destination: str | Path):
     )
 
 
+def _pkcs7_pad(data: bytes) -> bytes:
+    padding = BLOCK_SIZE - len(data) % BLOCK_SIZE
+    return data + bytes([padding]) * padding
+
+
+def _pkcs7_unpad(data: bytes) -> bytes:
+    if not data or len(data) % BLOCK_SIZE:
+        raise ValueError("invalid PKCS#7 padding")
+    padding = data[-1]
+    if not 1 <= padding <= BLOCK_SIZE or data[-padding:] != bytes([padding]) * padding:
+        raise ValueError("invalid PKCS#7 padding")
+    return data[:-padding]
+
+
+def _cbc_encrypt(data: bytes, keys: list[bytes], previous: bytes) -> tuple[bytes, bytes]:
+    if len(data) % BLOCK_SIZE or len(previous) != BLOCK_SIZE:
+        raise ValueError("CBC needs whole blocks and a 16-byte IV")
+    output = bytearray()
+    for i in range(0, len(data), BLOCK_SIZE):
+        previous = _aes_encrypt_block(_xor(data[i:i + BLOCK_SIZE], previous), keys)
+        output.extend(previous)
+    return bytes(output), previous
+
+
+def _cbc_decrypt(data: bytes, keys: list[bytes], previous: bytes) -> tuple[bytes, bytes]:
+    if len(data) % BLOCK_SIZE or len(previous) != BLOCK_SIZE:
+        raise ValueError("CBC needs whole blocks and a 16-byte IV")
+    output = bytearray()
+    for i in range(0, len(data), BLOCK_SIZE):
+        block = data[i:i + BLOCK_SIZE]
+        output.extend(_xor(_aes_decrypt_block(block, keys), previous))
+        previous = block
+    return bytes(output), previous
+
+
+def _require_variant_key(key: PublicKey | PrivateKey) -> None:
+    if key.n.bit_length() != RSA_BITS:
+        raise ValueError("variant 3 requires a 2048-bit RSA modulus")
+
+
 def encrypt_file(source: str | Path, destination: str | Path, key: PublicKey) -> None:
-    """Write HYB1 container while reading source in BUFFER_SIZE chunks."""
-    session_key, nonce = secrets.token_bytes(32), secrets.token_bytes(12)
-    wrapped = rsa_oaep_encrypt(session_key, key)
-    keys, subkey, counter = _gcm_context(session_key, nonce)
-    ghash, total = _GHash(subkey), 0
-    output = _temporary(destination)
-    name = output.name
-    try:
-        with Path(source).open("rb") as input_file, output:
-            output.write(MAGIC + len(wrapped).to_bytes(2, "big") + wrapped + nonce)
-            while chunk := input_file.read(BUFFER_SIZE):
-                ciphertext, counter = _gcm_transform(chunk, keys, counter)
-                output.write(ciphertext)
-                ghash.update(ciphertext)
-                total += len(ciphertext)
-            output.write(
-                _xor(_aes_encrypt_block(nonce + b"\0\0\0\1", keys), ghash.finish(total))
-            )
-        os.replace(name, destination)
-    except Exception:
+    """HYB1: RSA(AES key || HMAC key), IV, CBC ciphertext, Encrypt-then-MAC."""
+    _require_variant_key(key)
+    aes_key, mac_key = secrets.token_bytes(AES256_KEY_SIZE), secrets.token_bytes(HMAC_KEY_SIZE)
+    iv = secrets.token_bytes(IV_SIZE)
+    wrapped = rsa_oaep_encrypt(aes_key + mac_key, key)
+    header = MAGIC + len(wrapped).to_bytes(2, "big") + wrapped + iv
+    mac = hmac.new(mac_key, header, hashlib.sha256)
+    keys, previous, pending = _expand_aes_key(aes_key), iv, b""
+    # Открываем источник до создания временного файла.
+    with Path(source).open("rb") as input_file:
+        output = _temporary(destination)
+        name = output.name
         try:
-            os.unlink(name)
-        except FileNotFoundError:
-            pass
-        raise
+            with output:
+                output.write(header)
+                while chunk := input_file.read(BUFFER_SIZE):
+                    pending += chunk
+                    full = len(pending) // BLOCK_SIZE * BLOCK_SIZE
+                    ciphertext, previous = _cbc_encrypt(pending[:full], keys, previous)
+                    pending = pending[full:]
+                    output.write(ciphertext)
+                    mac.update(ciphertext)
+                ciphertext, _ = _cbc_encrypt(_pkcs7_pad(pending), keys, previous)
+                output.write(ciphertext)
+                mac.update(ciphertext)
+                output.write(mac.digest())
+            os.replace(name, destination)
+        except Exception:
+            try:
+                os.unlink(name)
+            except FileNotFoundError:
+                pass
+            raise
 
 
 def decrypt_file(source: str | Path, destination: str | Path, key: PrivateKey) -> None:
-    """Only replaces destination after the GCM tag has been authenticated."""
-    source_path = Path(source)
+    """Authenticate a bounded-memory snapshot before CBC decryption and unpadding."""
+    _require_variant_key(key)
     try:
-        size = source_path.stat().st_size
-        with source_path.open("rb") as input_file:
-            header = input_file.read(6)
-            if len(header) != 6 or header[:4] != MAGIC:
+        with Path(source).open("rb") as input_file:
+            size = os.fstat(input_file.fileno()).st_size
+            prefix = input_file.read(6)
+            if len(prefix) != 6 or prefix[:4] != MAGIC:
                 raise ValueError("invalid encrypted-file signature (expected HYB1)")
-            wrapped_size = int.from_bytes(header[4:], "big")
+            wrapped_size = int.from_bytes(prefix[4:], "big")
             if wrapped_size != key.size_bytes:
-                raise ValueError("encrypted file belongs to a different RSA key size")
-            wrapped, nonce = input_file.read(wrapped_size), input_file.read(12)
-            if len(wrapped) != wrapped_size or len(nonce) != 12:
+                raise ValueError("invalid encrypted session material length")
+            wrapped, iv = input_file.read(wrapped_size), input_file.read(IV_SIZE)
+            if len(wrapped) != wrapped_size or len(iv) != IV_SIZE:
                 raise ValueError("encrypted file header is truncated")
-            ciphertext_size = size - 6 - wrapped_size - 12 - 16
-            if ciphertext_size < 0:
-                raise ValueError("encrypted file is truncated")
-            session_key = rsa_oaep_decrypt(wrapped, key)
-            if len(session_key) != 32:
-                raise ValueError("invalid decrypted AES session key")
-            keys, subkey, counter = _gcm_context(session_key, nonce)
-            ghash, processed = _GHash(subkey), 0
-            output = _temporary(destination)
-            name = output.name
-            try:
-                with output:
-                    while processed < ciphertext_size:
-                        chunk = input_file.read(
-                            min(BUFFER_SIZE, ciphertext_size - processed)
-                        )
-                        if not chunk:
-                            raise ValueError("encrypted file is truncated")
-                        plaintext, counter = _gcm_transform(chunk, keys, counter)
-                        output.write(plaintext)
-                        ghash.update(chunk)
-                        processed += len(chunk)
-                    tag = input_file.read(16)
-                    if len(tag) != 16 or input_file.read(1):
-                        raise ValueError("encrypted file has invalid length")
-                    expected = _xor(
-                        _aes_encrypt_block(nonce + b"\0\0\0\1", keys),
-                        ghash.finish(processed),
-                    )
-                    if not hmac.compare_digest(tag, expected):
-                        raise ValueError(
-                            "authentication failed: wrong key or damaged file"
-                        )
-                os.replace(name, destination)
-            except Exception:
+            ciphertext_size = size - 6 - wrapped_size - IV_SIZE - TAG_SIZE
+            if ciphertext_size < BLOCK_SIZE or ciphertext_size % BLOCK_SIZE:
+                raise ValueError("invalid CBC ciphertext length")
+            material = rsa_oaep_decrypt(wrapped, key)
+            if len(material) != AES256_KEY_SIZE + HMAC_KEY_SIZE:
+                raise ValueError("invalid AES/HMAC session material (variant 3 required)")
+            aes_key, mac_key = material[:AES256_KEY_SIZE], material[AES256_KEY_SIZE:]
+            mac = hmac.new(mac_key, prefix + wrapped + iv, hashlib.sha256)
+            # Снимок исключает изменение шифртекста между проверкой и расшифровкой.
+            with tempfile.TemporaryFile("w+b") as authenticated:
+                remaining = ciphertext_size
+                while remaining:
+                    chunk = input_file.read(min(BUFFER_SIZE, remaining))
+                    if not chunk:
+                        raise ValueError("encrypted file is truncated")
+                    authenticated.write(chunk)
+                    mac.update(chunk)
+                    remaining -= len(chunk)
+                tag = input_file.read(TAG_SIZE)
+                if len(tag) != TAG_SIZE or input_file.read(1):
+                    raise ValueError("encrypted file has invalid length")
+                if not hmac.compare_digest(tag, mac.digest()):
+                    raise ValueError("authentication failed: wrong key or damaged file")
+                authenticated.seek(0)
+                keys, previous = _expand_aes_key(aes_key), iv
+                output = _temporary(destination)
+                name = output.name
                 try:
-                    os.unlink(name)
-                except FileNotFoundError:
-                    pass
-                raise
+                    with output:
+                        remaining = ciphertext_size
+                        chunk_size = max(BLOCK_SIZE, BUFFER_SIZE // BLOCK_SIZE * BLOCK_SIZE)
+                        while remaining:
+                            chunk = authenticated.read(min(chunk_size, remaining))
+                            plaintext, previous = _cbc_decrypt(chunk, keys, previous)
+                            remaining -= len(chunk)
+                            output.write(_pkcs7_unpad(plaintext) if not remaining else plaintext)
+                    os.replace(name, destination)
+                except Exception:
+                    try:
+                        os.unlink(name)
+                    except FileNotFoundError:
+                        pass
+                    raise
     except OSError as error:
         raise ValueError(f"cannot process encrypted file: {error}") from error
 

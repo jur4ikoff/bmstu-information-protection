@@ -57,3 +57,17 @@ python_hashlib:
   author: "Python Software Foundation"
   url: "https://docs.python.org/3/library/hashlib.html#hashlib.pbkdf2_hmac"
   date: 2026
+
+nist_cbc:
+  type: web
+  title: "SP 800-38A: Recommendation for Block Cipher Modes of Operation: Methods and Techniques"
+  author: "Morris Dworkin"
+  url: "https://csrc.nist.gov/pubs/sp/800/38/a/final"
+  date: 2001
+
+hmac_rfc:
+  type: web
+  title: "RFC 2104: HMAC: Keyed-Hashing for Message Authentication"
+  author: "Krawczyk H.; Bellare M.; Canetti R."
+  url: "https://www.rfc-editor.org/rfc/rfc2104"
+  date: 1997-02

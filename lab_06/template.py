@@ -5,7 +5,7 @@ import os
 import secrets
 import zlib
 
-VARIANT = 0  # Укажите вариант от 1 до 20 или введите его при запуске.
+VARIANT = 15
 
 
 def variant(n: int) -> dict:
@@ -152,8 +152,11 @@ if __name__ == '__main__':
     for i, record in enumerate((first, second), 1):
         print(f'Запись {i}: соль={record["salt"].hex()}, хеш={record["hash"].hex()}, итерации={record["iterations"]}')
     print('Записи различаются:', first != second)
+    # Усреднение уменьшает влияние шага таймера os.times().elapsed.
+    checks = 50
     start = os.times().elapsed
-    valid = check_password('example-password', first)
-    elapsed = os.times().elapsed - start
-    print(f'Пароль верен: {valid}, время проверки: {elapsed:.3f} с')
+    valid = all(check_password('example-password', first) for _ in range(checks))
+    elapsed = (os.times().elapsed - start) / checks
+    print(f'Пароль верен: {valid}, среднее время проверки ({checks} проверок): {elapsed:.6f} с')
+    print('Неверный пароль принят:', check_password('wrong-password', first))
     print(f'Оценка перебора 10 млн паролей: {elapsed * 10_000_000 / 86400:.2f} суток')

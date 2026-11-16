@@ -43,11 +43,11 @@ def _file_arguments(parser: argparse.ArgumentParser, private: bool = False) -> N
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="ЛР №5: RSA-OAEP-SHA256 + AES-256-GCM")
+    parser = argparse.ArgumentParser(description="ЛР №5, вариант 3: RSA-2048 + AES-256-CBC + HMAC-SHA256")
     commands = parser.add_subparsers(dest="command", required=True)
     keygen = commands.add_parser("keygen", help="создать RSA-ключи в PEM")
     keygen.add_argument(
-        "--bits", type=int, default=2048, help="размер модуля RSA, минимум 2048"
+        "--bits", type=int, choices=[2048], default=2048, help="вариант 3: RSA-2048"
     )
     keygen.add_argument("--public", "--pub", dest="public", required=True)
     keygen.add_argument("--private", "--priv", dest="private", required=True)
@@ -56,7 +56,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     _file_arguments(commands.add_parser("encrypt", help="зашифровать файл"))
     _file_arguments(
-        commands.add_parser("decrypt", help="расшифровать и проверить GCM-тег"),
+        commands.add_parser("decrypt", help="проверить HMAC и расшифровать CBC"),
         private=True,
     )
     return parser
@@ -66,8 +66,6 @@ def main() -> int:
     arguments = build_parser().parse_args()
     try:
         if arguments.command == "keygen":
-            if arguments.bits < 2048 or arguments.bits % 2:
-                raise ValueError("RSA-модуль должен быть чётным и не менее 2048 бит")
             started = time.perf_counter()
             public, private = generate_key_pair(arguments.bits)
             save_public_key(arguments.public, public)
@@ -79,7 +77,7 @@ def main() -> int:
             encrypt_file(
                 arguments.source, arguments.destination, load_public_key(arguments.key)
             )
-            print("Файл зашифрован: HYB1 / RSA-OAEP / AES-256-GCM.")
+            print("Файл зашифрован: вариант 3 / HYB1 / RSA-2048-OAEP / AES-256-CBC / HMAC-SHA256.")
         else:
             decrypt_file(
                 arguments.source,

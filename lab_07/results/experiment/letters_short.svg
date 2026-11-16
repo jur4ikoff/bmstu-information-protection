@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560">
+<rect width="100%" height="100%" fill="white"/>
+<g font-family="sans-serif" font-size="13">
+<text x="65" y="28" font-size="20">Короткий ключ</text>
+<path d="M 65 450.0 H 1070" stroke="#ddd"/>
+<text x="57" y="454.0" text-anchor="end">0.0%</text>
+<path d="M 65 378.0 H 1070" stroke="#ddd"/>
+<text x="57" y="382.0" text-anchor="end">1.2%</text>
+<path d="M 65 306.0 H 1070" stroke="#ddd"/>
+<text x="57" y="310.0" text-anchor="end">2.4%</text>
+<path d="M 65 234.00000000000006 H 1070" stroke="#ddd"/>
+<text x="57" y="238.00000000000006" text-anchor="end">3.6%</text>
+<path d="M 65 162.00000000000003 H 1070" stroke="#ddd"/>
+<text x="57" y="166.00000000000003" text-anchor="end">4.8%</text>
+<path d="M 65 90.0 H 1070" stroke="#ddd"/>
+<text x="57" y="94.0" text-anchor="end">6.0%</text>
+<text transform="translate(80.703125,468) rotate(60)">А</text>
+<text transform="translate(112.109375,468) rotate(60)">Б</text>
+<text transform="translate(143.515625,468) rotate(60)">В</text>
+<text transform="translate(174.921875,468) rotate(60)">Г</text>
+<text transform="translate(206.328125,468) rotate(60)">Д</text>
+<text transform="translate(237.734375,468) rotate(60)">Е</text>
+<text transform="translate(269.140625,468) rotate(60)">Ж</text>
+<text transform="translate(300.546875,468) rotate(60)">З</text>
+<text transform="translate(331.953125,468) rotate(60)">И</text>
+<text transform="translate(363.359375,468) rotate(60)">Й</text>
+<text transform="translate(394.765625,468) rotate(60)">К</text>
+<text transform="translate(426.171875,468) rotate(60)">Л</text>
+<text transform="translate(457.578125,468) rotate(60)">М</text>
+<text transform="translate(488.984375,468) rotate(60)">Н</text>
+<text transform="translate(520.390625,468) rotate(60)">О</text>
+<text transform="translate(551.796875,468) rotate(60)">П</text>
+<text transform="translate(583.203125,468) rotate(60)">Р</text>
+<text transform="translate(614.609375,468) rotate(60)">С</text>
+<text transform="translate(646.015625,468) rotate(60)">Т</text>
+<text transform="translate(677.421875,468) rotate(60)">У</text>
+<text transform="translate(708.828125,468) rotate(60)">Ф</text>
+<text transform="translate(740.234375,468) rotate(60)">Х</text>
+<text transform="translate(771.640625,468) rotate(60)">Ц</text>
+<text transform="translate(803.046875,468) rotate(60)">Ч</text>
+<text transform="translate(834.453125,468) rotate(60)">Ш</text>
+<text transform="translate(865.859375,468) rotate(60)">Щ</text>
+<text transform="translate(897.265625,468) rotate(60)">Ъ</text>
+<text transform="translate(928.671875,468) rotate(60)">Ы</text>
+<text transform="translate(960.078125,468) rotate(60)">Ь</text>
+<text transform="translate(991.484375,468) rotate(60)">Э</text>
+<text transform="translate(1022.890625,468) rotate(60)">Ю</text>
+<text transform="translate(1054.296875,468) rotate(60)">Я</text>
+<text x="65" y="60" fill="#2563eb">Короткий ключ</text>
+<rect x="68.140625" y="361.5675022651767" width="25.125" height="88.4324977348233" fill="#2563eb"/>
+<rect x="99.546875" y="364.7568710359408" width="25.125" height="85.24312896405922" fill="#2563eb"/>
+<rect x="130.953125" y="283.4279673814558" width="25.125" height="166.5720326185442" fill="#2563eb"/>
+<rect x="162.359375" y="256.24584717607974" width="25.125" height="193.75415282392026" fill="#2563eb"/>
+<rect x="193.765625" y="328.29658713379644" width="25.125" height="121.70341286620356" fill="#2563eb"/>
+<rect x="225.171875" y="212.68196919359718" width="25.125" height="237.31803080640282" fill="#2563eb"/>
+<rect x="256.578125" y="210.652370884929" width="25.125" height="239.347629115071" fill="#2563eb"/>
+<rect x="287.984375" y="330.5436424041076" width="25.125" height="119.45635759589243" fill="#2563eb"/>
+<rect x="319.390625" y="314.95922681969193" width="25.125" height="135.04077318030807" fill="#2563eb"/>
+<rect x="350.796875" y="237.03714889761403" width="25.125" height="212.96285110238597" fill="#2563eb"/>
+<rect x="382.203125" y="229.9335548172758" width="25.125" height="220.0664451827242" fill="#2563eb"/>
+<rect x="413.609375" y="207.97040169133194" width="25.125" height="242.02959830866806" fill="#2563eb"/>
+<rect x="445.015625" y="196.3002114164905" width="25.125" height="253.6997885835095" fill="#2563eb"/>
+<rect x="476.421875" y="315.321655089097" width="25.125" height="134.67834491090298" fill="#2563eb"/>
+<rect x="507.828125" y="291.6913319238901" width="25.125" height="158.30866807610988" fill="#2563eb"/>
+<rect x="539.234375" y="180.3533675626699" width="25.125" height="269.64663243733014" fill="#2563eb"/>
+<rect x="570.640625" y="205.50588945937784" width="25.125" height="244.49411054062216" fill="#2563eb"/>
+<rect x="602.046875" y="370.62820900030204" width="25.125" height="79.37179099969796" fill="#2563eb"/>
+<rect x="633.453125" y="258.34793113862884" width="25.125" height="191.65206886137116" fill="#2563eb"/>
+<rect x="664.859375" y="275.59951676230753" width="25.125" height="174.40048323769247" fill="#2563eb"/>
+<rect x="696.265625" y="387.22742373905163" width="25.125" height="62.77257626094837" fill="#2563eb"/>
+<rect x="727.671875" y="297.9975838115373" width="25.125" height="152.0024161884627" fill="#2563eb"/>
+<rect x="759.078125" y="281.25339776502574" width="25.125" height="168.74660223497426" fill="#2563eb"/>
+<rect x="790.484375" y="184.91996375717312" width="25.125" height="265.08003624282685" fill="#2563eb"/>
+<rect x="821.890625" y="158.3902144367261" width="25.125" height="291.60978556327393" fill="#2563eb"/>
+<rect x="853.296875" y="122.72727272727278" width="25.125" height="327.27272727272725" fill="#2563eb"/>
+<rect x="884.703125" y="277.91905768649957" width="25.125" height="172.08094231350043" fill="#2563eb"/>
+<rect x="916.109375" y="242.83600120809427" width="25.125" height="207.16399879190573" fill="#2563eb"/>
+<rect x="947.515625" y="134.32497734823318" width="25.125" height="315.6750226517668" fill="#2563eb"/>
+<rect x="978.921875" y="278.35397160978556" width="25.125" height="171.64602839021444" fill="#2563eb"/>
+<rect x="1010.328125" y="267.4086378737542" width="25.125" height="182.59136212624583" fill="#2563eb"/>
+<rect x="1041.734375" y="294.3008154636062" width="25.125" height="155.69918453639377" fill="#2563eb"/>
+</g></svg>
